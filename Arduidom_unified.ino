@@ -20,8 +20,8 @@
 //#define FOR_BOBOX59_ONLY    // LIGNE A RETIRER POUR DESACTIVER DES FONCTIONS QUI ME SONT PERSONELLES $$
 //
 //
-#define DBG_PRINT_CP // Affiche l'etat des pins dans le port série pour debug
-#define DBG_PRINT_SERIAL // Affiche les entrées/sorties sur le port network via serie pour debug
+//#define DBG_PRINT_CP // Affiche l'etat des pins dans le port série pour debug
+//#define DBG_PRINT_SERIAL // Affiche les entrées/sorties sur le port network via serie pour debug
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -30,22 +30,22 @@
 //
 // INFO: La cle API de JeeDom est automatiquement envoyee a l'arduino via la Configuration des Pins puis stockee dans l'EEPROM
 //
-#define CNF_NETWORK 1 // Mettre à 1 pour Activation du Shield Ethernet sur Arduino ( consomme 35% Firmware / 12% RAM sur un UNO)
+#define CNF_NETWORK 0 // Mettre à 1 pour Activation du Shield Ethernet sur Arduino ( consomme 35% Firmware / 12% RAM sur un UNO)
 //
 #define CNF_DHT 1 // Mettre à 0 pour desactiver les DHT pour gagner en espace Programme/Ram surtout sur les petits arduino ( 4,9% Firmware / 6,3% RAM sur un UNO)
 //
-#define CNF_RADIO 0 // Mettre à 0 pour desactiver la RADIO pour gagner en espace Programme/Ram surtout sur les petits arduino ( consomme 18,8% Firmware / 23,9% RAM sur un UNO )
+#define CNF_RADIO 1 // Mettre à 0 pour desactiver la RADIO pour gagner en espace Programme/Ram surtout sur les petits arduino ( consomme 18,8% Firmware / 23,9% RAM sur un UNO )
 //
 #if (CNF_NETWORK == 1) // NE PAS MODIFIER CETTE LIGNE, pour (dés)activer le réseau, modifier la ligne #define CNF_NETWORK 0 !
     #include <SPI.h>
     #include <Ethernet.h>
-    IPAddress CNF_IP_ARDUIN (192, 168, 10, 230); // ADRESSE IP DE L'ARDUINO, A ADAPTER A VOTRE RESEAU
+    IPAddress CNF_IP_ARDUIN (192, 168, 1, 191); // ADRESSE IP DE L'ARDUINO, A ADAPTER A VOTRE RESEAU
     //
-    IPAddress CNF_IP_JEEDOM (192, 168, 10, 219); // ADRESSE IP JeeDom
+    IPAddress CNF_IP_JEEDOM (192, 168, 1, 2); // ADRESSE IP JeeDom
     //
     #define CNF_PORT_JEEDOM 80 // Port d'ecoute Jeedom
     //
-    #define CNF_JEEDOM_BOX 1 // Mettre a 1 si c'est une jeedom Box ( pas de /jeedom dans le http pour les Jeedom BOX)
+    #define CNF_JEEDOM_BOX 0 // Mettre a 1 si c'est une jeedom Box ( pas de /jeedom dans le http pour les Jeedom BOX)
     //
     //#define CNF_AID . // Désormais détecté automatiquement par jeedom ! //Numéro de l'arduino dans jeedom
 #endif
@@ -165,7 +165,7 @@ unsigned long TimerReadyToSend = 0;
 unsigned long TimerCustomHook = 0; //tempo d'actualisation
 String data;
 String request;
-String CNF_API = "................................................";    // Creation de la variable vide, jeedom l'enverra pour la stocker dans l'eeprom, NE PAS LA CHANGER ICI !
+String CNF_API = "....................";    // Creation de la variable vide, jeedom l'enverra pour la stocker dans l'eeprom, NE PAS LA CHANGER ICI !
 //IPAddress CNF_IP_JEEDOM(0,0,0,0); // Creation de la variable VIDE, jeedom l'enverra pour la stocker dans l'eeprom, NE PAS LA CHANGER ICI !
 char pinmode[CNF_NB_DPIN + CNF_NB_APIN + CNF_NB_CPIN]; // Pin Modes
 byte RadioRXpin = 0;
@@ -825,13 +825,13 @@ void loop() {
                         DHTValue[i] = 999;
                     }
                     for (int j = 1; j <= DHT_QTY; j++) {
-                        Serial.print(F("DHT"));
-                        Serial.print(j);
+                        //Serial.print(F("DHT"));
+                        //Serial.print(j);
                         dhtlib.setup(dhtpin[j]);
-                        Serial.println(dhtlib.getStatusString());
+                        //Serial.println(dhtlib.getStatusString());
                         DHTValue[((j * 2) - 1)] = (dhtlib.getHumidity());
                         DHTValue[(j * 2)] = (dhtlib.getTemperature());
-                        Serial.println(dhtlib.getStatusString());
+                        //Serial.println(dhtlib.getStatusString());
                         if (dhtlib.getStatusString() != "OK") {
                             DHTValue[((j * 2) - 1)] = 999;
                             DHTValue[(j * 2)] = 999;
@@ -926,9 +926,9 @@ void loop() {
                 #endif
                 //Serial.print(F("/plugins/arduidom/core/php/jeeArduidom.php?api="));
                 client2.print(F("/plugins/arduidom/core/php/jeeArduidom.php?api="));
-                Serial.print(CNF_API);
+                //Serial.print(CNF_API);
                 client2.print(CNF_API);
-                Serial.print(F("&arduid=net&"));
+                //Serial.print(F("&arduid=net&"));
                 client2.print(F("&arduid=net&"));
                 int datalength = data.length();
                 //Serial.println(datalength);
@@ -1182,11 +1182,9 @@ void ReloadEEPROM() {
             Serial.print("\n");
         #endif
     }
-    for (int i = 0; i < 48; i++) {
+    for (int i = 0; i < 20; i++) {
         CNF_API[i] = EEPROM.read(200 + i); // Cle API Jeedom
     }
-    Serial.print("ApiKey : ");
-    Serial.println(CNF_API);
 }// END OF ReloadEEPROM()
 
 void InitEEPROM() {
